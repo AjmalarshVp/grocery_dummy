@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:grocery_app/dummy_date.dart';
+import 'package:grocery_app/consts/contss.dart';
+import 'package:grocery_app/models/products_model.dart';
+import 'package:grocery_app/providers/products_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../services/utils.dart';
+import '../widgets/back_widget.dart';
 import '../widgets/feed_items.dart';
 import '../widgets/text_widget.dart';
 
 class FeedsScreen extends StatefulWidget {
   static const routeName = "/FeedsScreenState";
-
   const FeedsScreen({Key? key}) : super(key: key);
 
   @override
@@ -18,7 +21,6 @@ class FeedsScreen extends StatefulWidget {
 class _FeedsScreenState extends State<FeedsScreen> {
   final TextEditingController? _searchTextController = TextEditingController();
   final FocusNode _searchTextFocusNode = FocusNode();
-
   @override
   void dispose() {
     _searchTextController!.dispose();
@@ -30,18 +32,11 @@ class _FeedsScreenState extends State<FeedsScreen> {
   Widget build(BuildContext context) {
     final Color color = Utils(context).color;
     Size size = Utils(context).getScreenSize;
+    final productProviders = Provider.of<ProductsProvider>(context);
+    List<ProductModel> allProducts = productProviders.getProducts;
     return Scaffold(
       appBar: AppBar(
-        leading: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            IconlyLight.arrowLeft2,
-            color: color,
-          ),
-        ),
+        leading: const BackWidget(),
         elevation: 0,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         centerTitle: true,
@@ -97,10 +92,11 @@ class _FeedsScreenState extends State<FeedsScreen> {
             crossAxisCount: 2,
             padding: EdgeInsets.zero,
             // crossAxisSpacing: 10,
-            childAspectRatio: size.width / (size.height * 0.69),
-            children: List.generate(10, (index) {
-              return FeedsWidget(
-                productList: productsList[index],
+            childAspectRatio: size.width / (size.height * 0.59),
+            children: List.generate(allProducts.length, (index) {
+              return ChangeNotifierProvider.value(
+                value: allProducts[index],
+                child: const FeedsWidget(),
               );
             }),
           ),
